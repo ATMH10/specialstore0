@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السلة</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: white;
+            direction: rtl;
+            text-align: center;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #111;
+            padding: 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .navbar a:hover {
+            color: #32ff7e;
+        }
+
+        .cart-items {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .cart-item {
+            background-color: #222;
+            border: 1px solid #32ff7e;
+            border-radius: 8px;
+            margin: 10px;
+            padding: 20px;
+            display: inline-block;
+            width: 200px;
+        }
+
+        .cart-item button {
+            background-color: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .cart-item button:hover {
+            background-color: #e60000;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #32ff7e;
+        }
+
+        .checkout {
+            margin-top: 30px;
+        }
+
+        .checkout button {
+            background-color: #32ff7e;
+            border: none;
+            color: #111;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .checkout button:hover {
+            background-color: #28d67b;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #111;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="scripts.html">السكريبتات</a>
+        <a href="bots.html">البوتات</a>
+        <a href="files.html">الملفات</a> <!-- رابط تصنيف الملفات -->
+        <a href="cart.html">السلة</a>
+    </div>
+    
+
+    <div class="cart-items" id="cart-items">
+        <h2>محتويات السلة</h2>
+        <!-- سيتم عرض المنتجات هنا بواسطة JavaScript -->
+    </div>
+
+    <div class="total" id="total">
+        <!-- سيتم عرض إجمالي السعر هنا -->
+    </div>
+
+    <div class="checkout">
+        <button id="checkout-btn" onclick="proceedToCheckout()">الدفع</button>
+    </div>
+
+    <div class="footer">
+        <p>© 2024 جميع الحقوق محفوظة</p>
+    </div>
+
+    <script>
+        function displayCartItems() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let cartItemsDiv = document.getElementById('cart-items');
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = "<p>السلة فارغة</p>";
+                document.getElementById('checkout-btn').style.display = "none"; // إخفاء زر الدفع إذا كانت السلة فارغة
+            } else {
+                cartItemsDiv.innerHTML = ""; // تنظيف المحتوى الحالي
+                cart.forEach(function(item, index) {
+                    let cartItem = document.createElement('div');
+                    cartItem.classList.add('cart-item');
+                    cartItem.innerHTML = `<h3>${item.name}</h3><p>السعر: ${item.price} ريال</p><button onclick="removeFromCart(${index})">حذف</button>`;
+                    cartItemsDiv.appendChild(cartItem);
+
+                    // حساب إجمالي السعر
+                    totalPrice += item.price;
+                });
+
+                // عرض زر الدفع إذا كانت هناك منتجات في السلة
+                document.getElementById('checkout-btn').style.display = "block";
+            }
+
+            // عرض إجمالي السعر
+            document.getElementById('total').innerHTML = `إجمالي السعر: ${totalPrice} ريال`;
+        }
+
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // إزالة المنتج من السلة
+            cart.splice(index, 1);
+
+            // تحديث السلة في localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            // إعادة عرض المنتجات بعد الحذف
+            displayCartItems();
+        }
+
+        // الانتقال إلى صفحة العد التنازلي قبل الدفع
+        function proceedToCheckout() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert("السلة فارغة، لا يمكنك المتابعة إلى الدفع.");
+                return;
+            }
+
+            window.location.href = "payment-redirect.html";  // الانتقال إلى صفحة العد التنازلي
+        }
+
+        // عرض المنتجات وإجمالي السعر عند تحميل الصفحة
+        window.onload = displayCartItems;
+    </script>
+</body>
+</html>
